@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Телетайп</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C1113;
+  --ink-2:#121A1D;
+  --ink-3:#182226;
+  --line:#24333A;
+  --tape:#EDE6D6;
+  --tape-2:#E2DAC7;
+  --tape-edge:#D3C9B2;
+  --tape-ink:#171C1E;
+  --tape-mute:#7C7666;
+  --signal:#D9A441;
+  --teal:#48A08C;
+  --danger:#C86A5A;
+  --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink);
+  color:var(--tape);
+  font-family:"IBM Plex Sans Condensed",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%;
+  -webkit-tap-highlight-color:transparent;
+  min-height:100dvh;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 3px,rgba(255,255,255,.012) 3px 4px),
+    radial-gradient(120% 60% at 50% 0%,rgba(72,160,140,.10),transparent 70%);
+}
+.wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:20px 14px calc(40px + env(safe-area-inset-bottom))}
+
+/* masthead */
+.mast{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+.mast-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{
+  margin:0;font-size:26px;font-weight:700;letter-spacing:.34em;text-indent:.34em;
+  text-transform:uppercase;color:var(--tape);line-height:1;
+}
+.mast-sub{
+  margin:8px 0 0;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:#6E8189;font-weight:500;
+}
+.wire{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6E8189;white-space:nowrap;font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:#44585F;flex:none}
+.wire[data-s="live"] .dot{background:var(--teal);box-shadow:0 0 0 0 rgba(72,160,140,.55);animation:pulse 2.2s infinite}
+.wire[data-s="live"]{color:var(--teal)}
+.wire[data-s="err"] .dot{background:var(--danger)}
+.wire[data-s="err"]{color:var(--danger)}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(72,160,140,0)}100%{box-shadow:0 0 0 0 rgba(72,160,140,0)}}
+@media (prefers-reduced-motion:reduce){.wire[data-s="live"] .dot{animation:none}}
+
+/* controls */
+.bar{display:flex;gap:8px;margin-bottom:14px}
+.field{
+  flex:1;min-width:0;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--tape);font-family:"IBM Plex Mono",monospace;font-size:15px;padding:11px 12px;
+}
+.field::placeholder{color:#54666D}
+.field:focus{outline:2px solid var(--teal);outline-offset:-1px;border-color:transparent}
+textarea.field{resize:vertical;min-height:44px;line-height:1.5}
+.btn{
+  background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);color:#9FB2B8;
+  font-family:inherit;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:11px 14px;cursor:pointer;white-space:nowrap;
+}
+.btn:hover{border-color:#354950;color:var(--tape)}
+.btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.btn-go{background:var(--signal);border-color:var(--signal);color:#1B1405}
+.btn-go:hover{background:#E4B054;border-color:#E4B054;color:#1B1405}
+
+/* slips */
+#feed{display:flex;flex-direction:column;gap:12px}
+.slip{
+  position:relative;background:var(--tape);border-radius:var(--r);
+  padding-left:20px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.06),0 10px 22px -14px #000;
+  animation:in .22s ease-out both;
+}
+@keyframes in{from{opacity:0;transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.slip{animation:none}}
+.slip::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:20px;
+  background:var(--tape-2);border-right:1px dashed var(--tape-edge);
+}
+.slip::after{
+  content:"";position:absolute;left:6px;top:9px;bottom:9px;width:7px;
+  background-image:radial-gradient(circle,var(--ink) 1.9px,transparent 2.1px);
+  background-size:7px 13px;opacity:.42;
+}
+.slip.fresh{box-shadow:0 0 0 1px var(--signal),0 10px 22px -14px #000}
+
+.slip-head{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px 8px 12px;border-bottom:1px solid var(--tape-edge);
+}
+.stamp{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.06em;
+  color:var(--tape-mute);text-transform:uppercase;white-space:nowrap;
+}
+.stamp b{color:#3E4A4D;font-weight:600}
+.spacer{flex:1}
+.mini{
+  background:none;border:1px solid transparent;border-radius:2px;color:var(--tape-mute);
+  font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:4px 7px;cursor:pointer;
+}
+.mini:hover{background:rgba(0,0,0,.06);color:var(--tape-ink)}
+.mini:focus-visible{outline:2px solid #3E8E7E;outline-offset:1px}
+.mini.del:hover{background:rgba(200,106,90,.14);color:#9C3E2C}
+
+.rows{display:flex;flex-direction:column}
+.row{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 10px 9px 12px;border-bottom:1px dotted var(--tape-edge);
+}
+.row:last-child{border-bottom:none}
+.row-body{flex:1;min-width:0}
+.lbl{
+  display:block;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tape-mute);margin-bottom:3px;
+}
+.val{
+  font-family:"IBM Plex Mono",monospace;font-size:15px;line-height:1.45;color:var(--tape-ink);
+  word-break:break-word;white-space:pre-wrap;margin:0;
+  -webkit-user-select:text;user-select:text;
+}
+.val a{color:#1F6B5C;text-decoration-thickness:1px;text-underline-offset:2px}
+.copy{
+  flex:none;background:#DDD4C0;border:1px solid var(--tape-edge);border-radius:2px;
+  color:#3E4A4D;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:7px 11px;cursor:pointer;min-width:78px;
+  transition:background .12s,color .12s;
+}
+.copy:hover{background:#D2C7AF}
+.copy:focus-visible{outline:2px solid #3E8E7E;outline-offset:1px}
+.copy.ok{background:var(--teal);border-color:var(--teal);color:#08201B}
+
+/* states */
+.note{
+  border:1px dashed var(--line);border-radius:var(--r);padding:26px 18px;text-align:center;
+  color:#6E8189;font-size:14px;line-height:1.6;
+}
+.note b{display:block;color:var(--tape);font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+.err{border-color:#57302A;color:#D08D7E}
+
+/* setup */
+.setup{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.setup h2{margin:0 0 4px;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--tape)}
+.setup p{margin:0 0 14px;font-size:13px;line-height:1.55;color:#7D9098}
+.setup label{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6E8189;margin:0 0 5px}
+.setup .field{width:100%;margin-bottom:12px;font-size:14px}
+.setup code{font-family:"IBM Plex Mono",monospace;color:var(--signal);font-size:12px}
+.hidden{display:none !important}
+.foot{margin-top:22px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.count{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#54666D;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="mast-top">
+      <h1>Телетайп</h1>
+      <span class="wire" id="wire" data-s="off"><span class="dot"></span><span id="wireText">не настроен</span></span>
+    </div>
+    <p class="mast-sub">лента с компьютера — на телефон</p>
+  </header>
+
+  <!-- настройка -->
+  <section class="setup hidden" id="setup">
+    <h2>Подключение</h2>
+    <p>Сайт читает ленту из файла в твоём репозитории. Токен хранится только в браузере этого телефона.</p>
+    <label for="inRepo">Репозиторий</label>
+    <input class="field" id="inRepo" placeholder="username/teletype-data" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <label for="inToken">GitHub-токен</label>
+    <input class="field" id="inToken" type="password" placeholder="github_pat_… или ghp_…" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <label for="inBranch">Ветка</label>
+    <input class="field" id="inBranch" placeholder="main" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div class="bar" style="margin:0">
+      <button class="btn btn-go" id="saveCfg" style="flex:1">Подключить</button>
+      <button class="btn hidden" id="cancelCfg">Отмена</button>
+    </div>
+  </section>
+
+  <!-- добавить с телефона -->
+  <div class="bar hidden" id="composeBar">
+    <textarea class="field" id="compose" rows="1" placeholder="Написать в ленту с телефона…"></textarea>
+    <button class="btn btn-go" id="send">В ленту</button>
+  </div>
+
+  <main id="feed" aria-live="polite"></main>
+
+  <div class="foot hidden" id="foot">
+    <span class="count" id="count"></span>
+    <span class="bar" style="margin:0">
+      <button class="btn" id="openCfg">Настройки</button>
+      <button class="btn" id="clearAll">Очистить</button>
+    </span>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const API   = "https://api.github.com";
+  const PATH  = "notes.json";
+  const POLL  = 1200;
+  const CFGK  = "teletype.cfg";
+
+  const $ = id => document.getElementById(id);
+  const feed = $("feed");
+
+  let cfg   = null;
+  let sha   = null;
+  let etag  = null;
+  let notes = [];
+  let seen  = new Set();
+  let first = true;
+  let timer = null;
+  let busy  = false;
+
+  /* ---------- конфиг ---------- */
+
+  function loadCfg(){
+    try { return JSON.parse(localStorage.getItem(CFGK) || "null"); }
+    catch { return null; }
+  }
+  function saveCfg(c){ localStorage.setItem(CFGK, JSON.stringify(c)); }
+
+  function showSetup(cancellable){
+    $("setup").classList.remove("hidden");
+    $("cancelCfg").classList.toggle("hidden", !cancellable);
+    $("inRepo").value   = cfg?.repo   || "";
+    $("inToken").value  = cfg?.token  || "";
+    $("inBranch").value = cfg?.branch || "main";
+  }
+  function hideSetup(){ $("setup").classList.add("hidden"); }
+
+  $("saveCfg").onclick = () => {
+    const repo   = $("inRepo").value.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\.git$/,"").replace(/\/+$/,"");
+    const token  = $("inToken").value.trim();
+    const branch = $("inBranch").value.trim() || "main";
+    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)) return wire("err","укажи owner/repo");
+    if(!token) return wire("err","нужен токен");
+    cfg = { repo, token, branch };
+    saveCfg(cfg);
+    sha = null; etag = null; notes = []; seen = new Set(); first = true;
+    hideSetup();
+    boot();
+  };
+  $("cancelCfg").onclick = hideSetup;
+  $("openCfg").onclick   = () => showSetup(true);
+
+  /* ---------- сеть ---------- */
+
+  const url = () =>
+    `${API}/repos/${cfg.repo}/contents/${PATH}?ref=${encodeURIComponent(cfg.branch)}`;
+
+  function headers(extra){
+    return Object.assign({
+      "Authorization": "Bearer " + cfg.token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    }, extra || {});
+  }
+
+  function b64enc(str){
+    const bytes = new TextEncoder().encode(str);
+    let bin = "", CH = 0x8000;
+    for(let i=0;i<bytes.length;i+=CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i+CH));
+    return btoa(bin);
+  }
+  function b64dec(b64){
+    const bin = atob(String(b64).replace(/\s/g,""));
+    const bytes = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+
+  async function pull(){
+    if(busy || !cfg) return;
+    busy = true;
+    try{
+      const h = headers(etag ? { "If-None-Match": etag } : null);
+      const r = await fetch(url(), { headers: h, cache: "no-store" });
+
+      if(r.status === 304){ wire("live","на связи"); return; }
+
+      if(r.status === 404){
+        sha = null; etag = null;
+        apply([]);
+        wire("live","на связи");
+        return;
+      }
+      if(r.status === 401 || r.status === 403){
+        wire("err", r.status === 401 ? "токен не принят" : "нет доступа");
+        fail("Не удалось прочитать ленту.", "Проверь токен и права на репозиторий — нужен доступ Contents: read and write.");
+        stop();
+        return;
+      }
+      if(!r.ok) throw new Error("HTTP " + r.status);
+
+      etag = r.headers.get("ETag");
+      const j = await r.json();
+      sha = j.sha;
+      let data;
+      try { data = JSON.parse(b64dec(j.content)); } catch { data = []; }
+      apply(Array.isArray(data) ? data : (data.notes || []));
+      wire("live","на связи");
+    }catch(e){
+      wire("err","нет связи");
+    }finally{
+      busy = false;
+    }
+  }
+
+  async function push(next){
+    const body = {
+      message: "teletype update",
+      content: b64enc(JSON.stringify(next, null, 1)),
+      branch: cfg.branch
+    };
+    if(sha) body.sha = sha;
+
+    for(let attempt = 0; attempt < 3; attempt++){
+      const r = await fetch(`${API}/repos/${cfg.repo}/contents/${PATH}`, {
+        method: "PUT",
+        headers: headers({ "Content-Type": "application/json" }),
+        body: JSON.stringify(body)
+      });
+      if(r.ok){
+        const j = await r.json();
+        sha  = j.content.sha;
+        etag = null;
+        return true;
+      }
+      if(r.status === 409 || r.status === 422){
+        const cur = await fetch(url(), { headers: headers(), cache: "no-store" });
+        if(cur.ok){ const cj = await cur.json(); sha = cj.sha; body.sha = sha; continue; }
+      }
+      throw new Error("HTTP " + r.status);
+    }
+    throw new Error("конфликт записи");
+  }
+
+  async function mutate(fn){
+    const next = fn(notes.slice());
+    const prev = notes;
+    apply(next);                      // оптимистично
+    try{ await push(next); }
+    catch(e){ apply(prev); wire("err","не записалось"); }
+  }
+
+  /* ---------- разбор текста ---------- */
+
+  const RX_URL_LINE = /^[a-z][a-z0-9+.\-]*:\/\//i;
+  const RX_PAIR     = /^\s*([^:\n]{1,48}?)\s*:\s*(\S.*)$/;
+
+  function parse(text){
+    const out = [];
+    for(const raw of String(text).split(/\r?\n/)){
+      const line = raw.trim();
+      if(!line) continue;
+      if(RX_URL_LINE.test(line)){ out.push({ label:"", value:line }); continue; }
+      const m = line.match(RX_PAIR);
+      if(m && /\p{L}/u.test(m[1]) && !m[2].startsWith("//")){
+        out.push({ label:m[1].trim(), value:m[2].trim() });
+      }else{
+        out.push({ label:"", value:line });
+      }
+    }
+    return out.length ? out : [{ label:"", value:String(text) }];
+  }
+
+  /* ---------- отрисовка ---------- */
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+  function linkify(s){
+    return esc(s).replace(/(https?:\/\/[^\s<]+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+  }
+
+  function clock(ts){
+    const d = new Date(ts * 1000), n = new Date();
+    const t = d.toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" });
+    return d.toDateString() === n.toDateString()
+      ? t
+      : d.toLocaleDateString("ru-RU",{ day:"2-digit", month:"2-digit" }) + " " + t;
+  }
+
+  function apply(list){
+    notes = list.slice().sort((a,b) => (b.ts||0) - (a.ts||0));
+    render();
+    first = false;
+  }
+
+  function render(){
+    $("foot").classList.remove("hidden");
+    $("composeBar").classList.remove("hidden");
+
+    if(!notes.length){
+      feed.innerHTML =
+        '<div class="note"><b>Лента пуста</b>Отправь боту любой текст — он появится здесь через пару секунд.<br>' +
+        'Строки вида <code style="font-family:IBM Plex Mono,monospace;color:#D9A441">Логин: значение</code> станут отдельными кнопками.</div>';
+      $("count").textContent = "";
+      return;
+    }
+
+    feed.innerHTML = "";
+    notes.forEach((n, i) => {
+      const fresh = !first && !seen.has(n.id);
+      seen.add(n.id);
+
+      const slip = document.createElement("article");
+      slip.className = "slip" + (fresh ? " fresh" : "");
+      if(first) slip.style.animation = "none";
+
+      const rows = parse(n.text);
+      const num  = String(notes.length - i).padStart(3, "0");
+
+      slip.innerHTML =
+        '<div class="slip-head">' +
+          '<span class="stamp"><b>№' + num + '</b> · ' + esc(clock(n.ts || 0)) +
+            (n.from === "web" ? " · с телефона" : " · бот") + '</span>' +
+          '<span class="spacer"></span>' +
+          '<button class="mini" data-all="1">Всё</button>' +
+          '<button class="mini del" data-del="1">Удалить</button>' +
+        '</div><div class="rows"></div>';
+
+      const box = slip.querySelector(".rows");
+      rows.forEach(r => {
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML =
+          '<div class="row-body">' +
+            (r.label ? '<span class="lbl">' + esc(r.label) + '</span>' : "") +
+            '<p class="val">' + linkify(r.value) + "</p>" +
+          "</div>" +
+          '<button class="copy">Копировать</button>';
+        row.querySelector(".copy").onclick = e => copy(r.value, e.currentTarget);
+        box.appendChild(row);
+      });
+
+      slip.querySelector("[data-all]").onclick = e => copy(n.text, e.currentTarget);
+      slip.querySelector("[data-del]").onclick = () =>
+        mutate(list => list.filter(x => x.id !== n.id));
+
+      feed.appendChild(slip);
+    });
+
+    $("count").textContent = notes.length + " " + plural(notes.length, "запись","записи","записей");
+  }
+
+  function plural(n, a, b, c){
+    const m = n % 100, k = n % 10;
+    if(m > 10 && m < 20) return c;
+    if(k === 1) return a;
+    if(k >= 2 && k <= 4) return b;
+    return c;
+  }
+
+  function fail(title, body){
+    feed.innerHTML = '<div class="note err"><b>' + esc(title) + "</b>" + esc(body) + "</div>";
+  }
+
+  /* ---------- копирование ---------- */
+
+  async function copy(text, btn){
+    let ok = false;
+    try{
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    }catch{
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly","");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0, text.length);
+      try{ ok = document.execCommand("copy"); }catch{}
+      ta.remove();
+    }
+    const label = btn.textContent;
+    btn.textContent = ok ? "Готово" : "Не вышло";
+    btn.classList.toggle("ok", ok);
+    setTimeout(() => { btn.textContent = label; btn.classList.remove("ok"); }, 1100);
+  }
+
+  /* ---------- отправка с телефона ---------- */
+
+  const ta = $("compose");
+  ta.addEventListener("input", () => {
+    ta.style.height = "auto";
+    ta.style.height = Math.min(ta.scrollHeight, 180) + "px";
+  });
+
+  $("send").onclick = async () => {
+    const text = ta.value.trim();
+    if(!text) return;
+    ta.value = ""; ta.style.height = "auto";
+    const note = { id: "w" + Date.now().toString(36), ts: Math.floor(Date.now()/1000), text, from: "web" };
+    await mutate(list => [note, ...list].slice(0, 300));
+  };
+
+  $("clearAll").onclick = () => {
+    if(!notes.length) return;
+    if(!confirm("Удалить всю ленту?")) return;
+    mutate(() => []);
+  };
+
+  /* ---------- статус и цикл ---------- */
+
+  function wire(state, text){
+    $("wire").dataset.s = state;
+    $("wireText").textContent = text;
+  }
+  function stop(){ clearInterval(timer); timer = null; }
+  function start(){
+    stop();
+    pull();
+    timer = setInterval(() => { if(!document.hidden) pull(); }, POLL);
+  }
+  function boot(){ wire("off","подключаюсь"); start(); }
+
+  document.addEventListener("visibilitychange", () => { if(!document.hidden) pull(); });
+
+  cfg = loadCfg();
+  if(cfg && cfg.repo && cfg.token){ boot(); }
+  else {
+    showSetup(false);
+    fail("Не подключено", "Заполни поля выше — репозиторий с notes.json и токен с правом записи.");
+  }
+})();
+</script>
+</body>
+</html>
