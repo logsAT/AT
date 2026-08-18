@@ -129,6 +129,8 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
     <p class="mast-sub">лента с компьютера — на телефон</p>
   </header>
 
+  <div class="note err hidden" id="banner" style="margin-bottom:14px;text-align:left;padding:12px 14px"></div>
+
   <section class="setup hidden" id="setup">
     <h2>Настройки</h2>
     <p id="setupHint"></p>
@@ -186,6 +188,27 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
   let timer = null;
   let busy  = false;
 
+  // то, что мы только что записали, но GitHub ещё может отдавать старую версию
+  const pend = { add: new Map(), del: new Set(), until: 0 };
+
+  function reconcile(list){
+    if(!pend.add.size && !pend.del.size) return list;
+    const ids = new Set(list.map(n => n.id));
+    let synced = true;
+    for(const id of pend.add.keys()) if(!ids.has(id)) synced = false;
+    for(const id of pend.del)        if(ids.has(id))  synced = false;
+    if(synced){ pend.add.clear(); pend.del.clear(); pend.until = 0; return list; }
+    const out = list.filter(n => !pend.del.has(n.id));
+    for(const [id, note] of pend.add) if(!ids.has(id)) out.push(note);
+    return out;
+  }
+
+  function banner(msg){
+    const b = $("banner");
+    b.textContent = msg || "";
+    b.classList.toggle("hidden", !msg);
+  }
+
   /* ---------- откуда читать ---------- */
 
   // ТЫ.github.io/РЕПО/ -> ТЫ/РЕПО
@@ -222,25 +245,31 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
   async function pull(){
     if(busy || !cfg.repo) return;
     busy = true;
+
+    // страховка от зависшей записи
+    if(pend.until && Date.now() > pend.until){
+      pend.add.clear(); pend.del.clear(); pend.until = 0; last = null;
+    }
+
     try{
       const u = RAW + "/" + cfg.repo + "/" + encodeURIComponent(cfg.branch) + "/" + PATH + "?t=" + Date.now();
       const r = await fetch(u, { cache: "no-store" });
 
       if(r.status === 404){
         wire("live","на связи");
-        if(last !== "__empty__"){ last = "__empty__"; apply([]); }
+        if(last !== "__empty__"){ last = "__empty__"; apply(reconcile([])); }
         return;
       }
       if(!r.ok) throw new Error("HTTP " + r.status);
 
       const text = await r.text();
       wire("live","на связи");
-      if(text === last) return;
+      if(text === last && !pend.until) return;
       last = text;
 
       let data;
       try { data = JSON.parse(text); } catch { data = []; }
-      apply(Array.isArray(data) ? data : (data.notes || []));
+      apply(reconcile(Array.isArray(data) ? data : (data.notes || [])));
     }catch(e){
       wire("err","нет связи");
       if(first){
@@ -301,9 +330,20 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
   async function mutate(fn){
     const prev = notes;
     const next = fn(notes.slice());
+    const prevIds = new Set(prev.map(n => n.id));
+    const nextIds = new Set(next.map(n => n.id));
     apply(next);
-    try{ await push(next); }
-    catch(e){ apply(prev); wire("err", e.message); }
+    try{
+      await push(next);
+      for(const n of next) if(!prevIds.has(n.id)) pend.add.set(n.id, n);
+      for(const n of prev) if(!nextIds.has(n.id)) pend.del.add(n.id);
+      pend.until = Date.now() + 60000;
+      banner("");
+    }catch(e){
+      apply(prev);
+      wire("err","ошибка записи");
+      banner("Не записалось: " + e.message + ". Проверь, что у токена стоит Contents: Read and write на этот репозиторий.");
+    }
   }
 
   /* ---------- разбор строк ---------- */
@@ -351,7 +391,7 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
       feed.innerHTML =
         '<div class="note"><b>Лента пуста</b>Отправь боту любой текст — он появится здесь через пару секунд.<br>' +
         'Строки вида <code>Логин: значение</code> станут отдельными кнопками.</div>';
-      $("count").textContent = "";
+      $("count").textContent = cfg.repo;
       return;
     }
 
