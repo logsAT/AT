@@ -10,29 +10,17 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#0C1113;
-  --ink-2:#121A1D;
-  --ink-3:#182226;
-  --line:#24333A;
-  --tape:#EDE6D6;
-  --tape-2:#E2DAC7;
-  --tape-edge:#D3C9B2;
-  --tape-ink:#171C1E;
-  --tape-mute:#7C7666;
-  --signal:#D9A441;
-  --teal:#48A08C;
-  --danger:#C86A5A;
-  --r:3px;
+  --ink:#0C1113; --ink-2:#121A1D; --line:#24333A;
+  --tape:#EDE6D6; --tape-2:#E2DAC7; --tape-edge:#D3C9B2;
+  --tape-ink:#171C1E; --tape-mute:#7C7666;
+  --signal:#D9A441; --teal:#48A08C; --danger:#C86A5A; --r:3px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
-  background:var(--ink);
-  color:var(--tape);
+  background:var(--ink);color:var(--tape);
   font-family:"IBM Plex Sans Condensed",system-ui,sans-serif;
-  -webkit-text-size-adjust:100%;
-  -webkit-tap-highlight-color:transparent;
-  min-height:100dvh;
+  -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;min-height:100dvh;
 }
 body::before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -42,17 +30,10 @@ body::before{
 }
 .wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:20px 14px calc(40px + env(safe-area-inset-bottom))}
 
-/* masthead */
 .mast{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
 .mast-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-h1{
-  margin:0;font-size:26px;font-weight:700;letter-spacing:.34em;text-indent:.34em;
-  text-transform:uppercase;color:var(--tape);line-height:1;
-}
-.mast-sub{
-  margin:8px 0 0;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
-  color:#6E8189;font-weight:500;
-}
+h1{margin:0;font-size:26px;font-weight:700;letter-spacing:.34em;text-indent:.34em;text-transform:uppercase;line-height:1}
+.mast-sub{margin:8px 0 0;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:#6E8189;font-weight:500}
 .wire{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6E8189;white-space:nowrap;font-weight:600}
 .dot{width:7px;height:7px;border-radius:50%;background:#44585F;flex:none}
 .wire[data-s="live"] .dot{background:var(--teal);box-shadow:0 0 0 0 rgba(72,160,140,.55);animation:pulse 2.2s infinite}
@@ -62,7 +43,6 @@ h1{
 @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(72,160,140,0)}100%{box-shadow:0 0 0 0 rgba(72,160,140,0)}}
 @media (prefers-reduced-motion:reduce){.wire[data-s="live"] .dot{animation:none}}
 
-/* controls */
 .bar{display:flex;gap:8px;margin-bottom:14px}
 .field{
   flex:1;min-width:0;background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);
@@ -79,37 +59,24 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
 .btn:hover{border-color:#354950;color:var(--tape)}
 .btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .btn-go{background:var(--signal);border-color:var(--signal);color:#1B1405}
-.btn-go:hover{background:#E4B054;border-color:#E4B054;color:#1B1405}
+.btn-go:hover{background:#E4B054;border-color:#E4B054}
 
-/* slips */
 #feed{display:flex;flex-direction:column;gap:12px}
 .slip{
-  position:relative;background:var(--tape);border-radius:var(--r);
-  padding-left:20px;overflow:hidden;
-  box-shadow:0 1px 0 rgba(255,255,255,.06),0 10px 22px -14px #000;
-  animation:in .22s ease-out both;
+  position:relative;background:var(--tape);border-radius:var(--r);padding-left:20px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.06),0 10px 22px -14px #000;animation:in .22s ease-out both;
 }
 @keyframes in{from{opacity:0;transform:translateY(-6px)}}
 @media (prefers-reduced-motion:reduce){.slip{animation:none}}
-.slip::before{
-  content:"";position:absolute;left:0;top:0;bottom:0;width:20px;
-  background:var(--tape-2);border-right:1px dashed var(--tape-edge);
-}
+.slip::before{content:"";position:absolute;left:0;top:0;bottom:0;width:20px;background:var(--tape-2);border-right:1px dashed var(--tape-edge)}
 .slip::after{
   content:"";position:absolute;left:6px;top:9px;bottom:9px;width:7px;
   background-image:radial-gradient(circle,var(--ink) 1.9px,transparent 2.1px);
   background-size:7px 13px;opacity:.42;
 }
 .slip.fresh{box-shadow:0 0 0 1px var(--signal),0 10px 22px -14px #000}
-
-.slip-head{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px 8px 12px;border-bottom:1px solid var(--tape-edge);
-}
-.stamp{
-  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.06em;
-  color:var(--tape-mute);text-transform:uppercase;white-space:nowrap;
-}
+.slip-head{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 12px;border-bottom:1px solid var(--tape-edge)}
+.stamp{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--tape-mute);text-transform:uppercase;white-space:nowrap}
 .stamp b{color:#3E4A4D;font-weight:600}
 .spacer{flex:1}
 .mini{
@@ -120,51 +87,34 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
 .mini:hover{background:rgba(0,0,0,.06);color:var(--tape-ink)}
 .mini:focus-visible{outline:2px solid #3E8E7E;outline-offset:1px}
 .mini.del:hover{background:rgba(200,106,90,.14);color:#9C3E2C}
-
 .rows{display:flex;flex-direction:column}
-.row{
-  display:flex;align-items:flex-start;gap:10px;
-  padding:9px 10px 9px 12px;border-bottom:1px dotted var(--tape-edge);
-}
+.row{display:flex;align-items:flex-start;gap:10px;padding:9px 10px 9px 12px;border-bottom:1px dotted var(--tape-edge)}
 .row:last-child{border-bottom:none}
 .row-body{flex:1;min-width:0}
-.lbl{
-  display:block;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--tape-mute);margin-bottom:3px;
-}
-.val{
-  font-family:"IBM Plex Mono",monospace;font-size:15px;line-height:1.45;color:var(--tape-ink);
-  word-break:break-word;white-space:pre-wrap;margin:0;
-  -webkit-user-select:text;user-select:text;
-}
+.lbl{display:block;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tape-mute);margin-bottom:3px}
+.val{font-family:"IBM Plex Mono",monospace;font-size:15px;line-height:1.45;color:var(--tape-ink);word-break:break-word;white-space:pre-wrap;margin:0;-webkit-user-select:text;user-select:text}
 .val a{color:#1F6B5C;text-decoration-thickness:1px;text-underline-offset:2px}
 .copy{
-  flex:none;background:#DDD4C0;border:1px solid var(--tape-edge);border-radius:2px;
-  color:#3E4A4D;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;padding:7px 11px;cursor:pointer;min-width:78px;
-  transition:background .12s,color .12s;
+  flex:none;background:#DDD4C0;border:1px solid var(--tape-edge);border-radius:2px;color:#3E4A4D;
+  font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:7px 11px;cursor:pointer;min-width:78px;transition:background .12s,color .12s;
 }
 .copy:hover{background:#D2C7AF}
 .copy:focus-visible{outline:2px solid #3E8E7E;outline-offset:1px}
 .copy.ok{background:var(--teal);border-color:var(--teal);color:#08201B}
 
-/* states */
-.note{
-  border:1px dashed var(--line);border-radius:var(--r);padding:26px 18px;text-align:center;
-  color:#6E8189;font-size:14px;line-height:1.6;
-}
+.note{border:1px dashed var(--line);border-radius:var(--r);padding:26px 18px;text-align:center;color:#6E8189;font-size:14px;line-height:1.6}
 .note b{display:block;color:var(--tape);font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+.note code{font-family:"IBM Plex Mono",monospace;color:var(--signal);font-size:13px}
 .err{border-color:#57302A;color:#D08D7E}
 
-/* setup */
 .setup{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:16px}
-.setup h2{margin:0 0 4px;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--tape)}
+.setup h2{margin:0 0 4px;font-size:14px;letter-spacing:.16em;text-transform:uppercase}
 .setup p{margin:0 0 14px;font-size:13px;line-height:1.55;color:#7D9098}
 .setup label{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6E8189;margin:0 0 5px}
 .setup .field{width:100%;margin-bottom:12px;font-size:14px}
-.setup code{font-family:"IBM Plex Mono",monospace;color:var(--signal);font-size:12px}
 .hidden{display:none !important}
-.foot{margin-top:22px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.foot{margin-top:22px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .count{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#54666D;font-weight:600}
 </style>
 </head>
@@ -174,40 +124,42 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
   <header class="mast">
     <div class="mast-top">
       <h1>Телетайп</h1>
-      <span class="wire" id="wire" data-s="off"><span class="dot"></span><span id="wireText">не настроен</span></span>
+      <span class="wire" id="wire" data-s="off"><span class="dot"></span><span id="wireText">подключаюсь</span></span>
     </div>
     <p class="mast-sub">лента с компьютера — на телефон</p>
   </header>
 
-  <!-- настройка -->
   <section class="setup hidden" id="setup">
-    <h2>Подключение</h2>
-    <p>Сайт читает ленту из файла в твоём репозитории. Токен хранится только в браузере этого телефона.</p>
-    <label for="inRepo">Репозиторий</label>
-    <input class="field" id="inRepo" placeholder="username/teletype-data" autocapitalize="off" autocorrect="off" spellcheck="false">
-    <label for="inToken">GitHub-токен</label>
-    <input class="field" id="inToken" type="password" placeholder="github_pat_… или ghp_…" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <h2>Настройки</h2>
+    <p id="setupHint"></p>
+
+    <label for="inRepo">Репозиторий с лентой</label>
+    <input class="field" id="inRepo" placeholder="username/repo" autocapitalize="off" autocorrect="off" spellcheck="false">
+
     <label for="inBranch">Ветка</label>
     <input class="field" id="inBranch" placeholder="main" autocapitalize="off" autocorrect="off" spellcheck="false">
+
+    <label for="inToken">GitHub-токен — только для удаления и записи (можно не заполнять)</label>
+    <input class="field" id="inToken" type="password" placeholder="github_pat_… (необязательно)" autocapitalize="off" autocorrect="off" spellcheck="false">
+
     <div class="bar" style="margin:0">
-      <button class="btn btn-go" id="saveCfg" style="flex:1">Подключить</button>
-      <button class="btn hidden" id="cancelCfg">Отмена</button>
+      <button class="btn btn-go" id="saveCfg" style="flex:1">Сохранить</button>
+      <button class="btn" id="closeCfg">Закрыть</button>
     </div>
   </section>
 
-  <!-- добавить с телефона -->
   <div class="bar hidden" id="composeBar">
-    <textarea class="field" id="compose" rows="1" placeholder="Написать в ленту с телефона…"></textarea>
+    <textarea class="field" id="compose" rows="1" placeholder="Написать в ленту…"></textarea>
     <button class="btn btn-go" id="send">В ленту</button>
   </div>
 
   <main id="feed" aria-live="polite"></main>
 
-  <div class="foot hidden" id="foot">
+  <div class="foot">
     <span class="count" id="count"></span>
     <span class="bar" style="margin:0">
       <button class="btn" id="openCfg">Настройки</button>
-      <button class="btn" id="clearAll">Очистить</button>
+      <button class="btn hidden" id="clearAll">Очистить</button>
     </span>
   </div>
 
@@ -217,156 +169,144 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
 (() => {
   "use strict";
 
-  const API   = "https://api.github.com";
-  const PATH  = "notes.json";
-  const POLL  = 1200;
-  const CFGK  = "teletype.cfg";
+  const PATH = "notes.json";
+  const POLL = 1500;
+  const CFGK = "teletype.cfg";
+  const API  = "https://api.github.com";
+  const RAW  = "https://raw.githubusercontent.com";
 
   const $ = id => document.getElementById(id);
   const feed = $("feed");
 
-  let cfg   = null;
-  let sha   = null;
-  let etag  = null;
+  let cfg   = {};
   let notes = [];
   let seen  = new Set();
   let first = true;
+  let last  = null;
   let timer = null;
   let busy  = false;
 
-  /* ---------- конфиг ---------- */
+  /* ---------- откуда читать ---------- */
+
+  // ТЫ.github.io/РЕПО/ -> ТЫ/РЕПО
+  function detect(){
+    const m = location.hostname.match(/^([\w-]+)\.github\.io$/i);
+    if(!m) return null;
+    const owner = m[1];
+    const seg = location.pathname.split("/").filter(Boolean)[0];
+    return seg ? owner + "/" + seg : owner + "/" + owner + ".github.io";
+  }
 
   function loadCfg(){
-    try { return JSON.parse(localStorage.getItem(CFGK) || "null"); }
-    catch { return null; }
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(CFGK) || "{}") || {}; } catch {}
+    return {
+      repo:   saved.repo   || detect() || "",
+      branch: saved.branch || "main",
+      token:  saved.token  || "",
+      auto:   !saved.repo
+    };
   }
-  function saveCfg(c){ localStorage.setItem(CFGK, JSON.stringify(c)); }
-
-  function showSetup(cancellable){
-    $("setup").classList.remove("hidden");
-    $("cancelCfg").classList.toggle("hidden", !cancellable);
-    $("inRepo").value   = cfg?.repo   || "";
-    $("inToken").value  = cfg?.token  || "";
-    $("inBranch").value = cfg?.branch || "main";
+  function persist(){
+    localStorage.setItem(CFGK, JSON.stringify({
+      repo:   cfg.auto ? "" : cfg.repo,
+      branch: cfg.branch,
+      token:  cfg.token
+    }));
   }
-  function hideSetup(){ $("setup").classList.add("hidden"); }
 
-  $("saveCfg").onclick = () => {
-    const repo   = $("inRepo").value.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\.git$/,"").replace(/\/+$/,"");
-    const token  = $("inToken").value.trim();
-    const branch = $("inBranch").value.trim() || "main";
-    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)) return wire("err","укажи owner/repo");
-    if(!token) return wire("err","нужен токен");
-    cfg = { repo, token, branch };
-    saveCfg(cfg);
-    sha = null; etag = null; notes = []; seen = new Set(); first = true;
-    hideSetup();
-    boot();
-  };
-  $("cancelCfg").onclick = hideSetup;
-  $("openCfg").onclick   = () => showSetup(true);
+  const canWrite = () => Boolean(cfg.token);
 
-  /* ---------- сеть ---------- */
+  /* ---------- чтение: без токена, raw + обход кэша ---------- */
 
-  const url = () =>
-    `${API}/repos/${cfg.repo}/contents/${PATH}?ref=${encodeURIComponent(cfg.branch)}`;
+  async function pull(){
+    if(busy || !cfg.repo) return;
+    busy = true;
+    try{
+      const u = RAW + "/" + cfg.repo + "/" + encodeURIComponent(cfg.branch) + "/" + PATH + "?t=" + Date.now();
+      const r = await fetch(u, { cache: "no-store" });
 
-  function headers(extra){
+      if(r.status === 404){
+        wire("live","на связи");
+        if(last !== "__empty__"){ last = "__empty__"; apply([]); }
+        return;
+      }
+      if(!r.ok) throw new Error("HTTP " + r.status);
+
+      const text = await r.text();
+      wire("live","на связи");
+      if(text === last) return;
+      last = text;
+
+      let data;
+      try { data = JSON.parse(text); } catch { data = []; }
+      apply(Array.isArray(data) ? data : (data.notes || []));
+    }catch(e){
+      wire("err","нет связи");
+      if(first){
+        first = false;
+        fail("Лента не читается",
+             "Проверь, что репозиторий " + (cfg.repo || "—") + " публичный и ветка называется " + cfg.branch + ".");
+      }
+    }finally{
+      busy = false;
+    }
+  }
+
+  /* ---------- запись: нужен токен ---------- */
+
+  function ghHeaders(extra){
     return Object.assign({
       "Authorization": "Bearer " + cfg.token,
       "Accept": "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28"
     }, extra || {});
   }
-
   function b64enc(str){
     const bytes = new TextEncoder().encode(str);
     let bin = "", CH = 0x8000;
-    for(let i=0;i<bytes.length;i+=CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i+CH));
+    for(let i=0;i<bytes.length;i+=CH) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+CH));
     return btoa(bin);
-  }
-  function b64dec(b64){
-    const bin = atob(String(b64).replace(/\s/g,""));
-    const bytes = new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
-    return new TextDecoder().decode(bytes);
-  }
-
-  async function pull(){
-    if(busy || !cfg) return;
-    busy = true;
-    try{
-      const h = headers(etag ? { "If-None-Match": etag } : null);
-      const r = await fetch(url(), { headers: h, cache: "no-store" });
-
-      if(r.status === 304){ wire("live","на связи"); return; }
-
-      if(r.status === 404){
-        sha = null; etag = null;
-        apply([]);
-        wire("live","на связи");
-        return;
-      }
-      if(r.status === 401 || r.status === 403){
-        wire("err", r.status === 401 ? "токен не принят" : "нет доступа");
-        fail("Не удалось прочитать ленту.", "Проверь токен и права на репозиторий — нужен доступ Contents: read and write.");
-        stop();
-        return;
-      }
-      if(!r.ok) throw new Error("HTTP " + r.status);
-
-      etag = r.headers.get("ETag");
-      const j = await r.json();
-      sha = j.sha;
-      let data;
-      try { data = JSON.parse(b64dec(j.content)); } catch { data = []; }
-      apply(Array.isArray(data) ? data : (data.notes || []));
-      wire("live","на связи");
-    }catch(e){
-      wire("err","нет связи");
-    }finally{
-      busy = false;
-    }
   }
 
   async function push(next){
-    const body = {
-      message: "teletype update",
-      content: b64enc(JSON.stringify(next, null, 1)),
-      branch: cfg.branch
-    };
-    if(sha) body.sha = sha;
+    const api = API + "/repos/" + cfg.repo + "/contents/" + PATH;
+    for(let attempt=0; attempt<3; attempt++){
+      let sha = null;
+      const cur = await fetch(api + "?ref=" + encodeURIComponent(cfg.branch),
+                              { headers: ghHeaders(), cache: "no-store" });
+      if(cur.ok) sha = (await cur.json()).sha;
+      else if(cur.status === 401) throw new Error("токен не принят");
+      else if(cur.status === 403) throw new Error("нет прав на запись");
 
-    for(let attempt = 0; attempt < 3; attempt++){
-      const r = await fetch(`${API}/repos/${cfg.repo}/contents/${PATH}`, {
+      const body = {
+        message: "teletype update",
+        content: b64enc(JSON.stringify(next, null, 1)),
+        branch: cfg.branch
+      };
+      if(sha) body.sha = sha;
+
+      const r = await fetch(api, {
         method: "PUT",
-        headers: headers({ "Content-Type": "application/json" }),
+        headers: ghHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify(body)
       });
-      if(r.ok){
-        const j = await r.json();
-        sha  = j.content.sha;
-        etag = null;
-        return true;
-      }
-      if(r.status === 409 || r.status === 422){
-        const cur = await fetch(url(), { headers: headers(), cache: "no-store" });
-        if(cur.ok){ const cj = await cur.json(); sha = cj.sha; body.sha = sha; continue; }
-      }
+      if(r.ok){ last = null; return; }
+      if(r.status === 409 || r.status === 422){ await new Promise(s => setTimeout(s,400)); continue; }
       throw new Error("HTTP " + r.status);
     }
     throw new Error("конфликт записи");
   }
 
   async function mutate(fn){
-    const next = fn(notes.slice());
     const prev = notes;
-    apply(next);                      // оптимистично
+    const next = fn(notes.slice());
+    apply(next);
     try{ await push(next); }
-    catch(e){ apply(prev); wire("err","не записалось"); }
+    catch(e){ apply(prev); wire("err", e.message); }
   }
 
-  /* ---------- разбор текста ---------- */
+  /* ---------- разбор строк ---------- */
 
   const RX_URL_LINE = /^[a-z][a-z0-9+.\-]*:\/\//i;
   const RX_PAIR     = /^\s*([^:\n]{1,48}?)\s*:\s*(\S.*)$/;
@@ -376,32 +316,25 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
     for(const raw of String(text).split(/\r?\n/)){
       const line = raw.trim();
       if(!line) continue;
-      if(RX_URL_LINE.test(line)){ out.push({ label:"", value:line }); continue; }
+      if(RX_URL_LINE.test(line)){ out.push({label:"",value:line}); continue; }
       const m = line.match(RX_PAIR);
-      if(m && /\p{L}/u.test(m[1]) && !m[2].startsWith("//")){
-        out.push({ label:m[1].trim(), value:m[2].trim() });
-      }else{
-        out.push({ label:"", value:line });
-      }
+      if(m && /\p{L}/u.test(m[1]) && !m[2].startsWith("//")) out.push({label:m[1].trim(), value:m[2].trim()});
+      else out.push({label:"", value:line});
     }
-    return out.length ? out : [{ label:"", value:String(text) }];
+    return out.length ? out : [{label:"", value:String(text)}];
   }
 
   /* ---------- отрисовка ---------- */
 
-  const esc = s => s.replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
-
-  function linkify(s){
-    return esc(s).replace(/(https?:\/\/[^\s<]+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-  }
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const linkify = s => esc(s).replace(/(https?:\/\/[^\s<]+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 
   function clock(ts){
-    const d = new Date(ts * 1000), n = new Date();
-    const t = d.toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" });
+    const d = new Date(ts*1000), n = new Date();
+    const t = d.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"});
     return d.toDateString() === n.toDateString()
-      ? t
-      : d.toLocaleDateString("ru-RU",{ day:"2-digit", month:"2-digit" }) + " " + t;
+      ? t : d.toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit"}) + " " + t;
   }
 
   function apply(list){
@@ -411,19 +344,19 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
   }
 
   function render(){
-    $("foot").classList.remove("hidden");
-    $("composeBar").classList.remove("hidden");
+    $("composeBar").classList.toggle("hidden", !canWrite());
+    $("clearAll").classList.toggle("hidden", !canWrite());
 
     if(!notes.length){
       feed.innerHTML =
         '<div class="note"><b>Лента пуста</b>Отправь боту любой текст — он появится здесь через пару секунд.<br>' +
-        'Строки вида <code style="font-family:IBM Plex Mono,monospace;color:#D9A441">Логин: значение</code> станут отдельными кнопками.</div>';
+        'Строки вида <code>Логин: значение</code> станут отдельными кнопками.</div>';
       $("count").textContent = "";
       return;
     }
 
     feed.innerHTML = "";
-    notes.forEach((n, i) => {
+    notes.forEach((n,i) => {
       const fresh = !first && !seen.has(n.id);
       seen.add(n.id);
 
@@ -431,65 +364,58 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
       slip.className = "slip" + (fresh ? " fresh" : "");
       if(first) slip.style.animation = "none";
 
-      const rows = parse(n.text);
-      const num  = String(notes.length - i).padStart(3, "0");
-
+      const num = String(notes.length - i).padStart(3,"0");
       slip.innerHTML =
         '<div class="slip-head">' +
-          '<span class="stamp"><b>№' + num + '</b> · ' + esc(clock(n.ts || 0)) +
-            (n.from === "web" ? " · с телефона" : " · бот") + '</span>' +
+          '<span class="stamp"><b>№' + num + '</b> · ' + esc(clock(n.ts||0)) +
+            (n.from === "web" ? " · с сайта" : " · бот") + '</span>' +
           '<span class="spacer"></span>' +
           '<button class="mini" data-all="1">Всё</button>' +
-          '<button class="mini del" data-del="1">Удалить</button>' +
+          (canWrite() ? '<button class="mini del" data-del="1">Удалить</button>' : "") +
         '</div><div class="rows"></div>';
 
       const box = slip.querySelector(".rows");
-      rows.forEach(r => {
+      parse(n.text).forEach(r => {
         const row = document.createElement("div");
         row.className = "row";
         row.innerHTML =
           '<div class="row-body">' +
             (r.label ? '<span class="lbl">' + esc(r.label) + '</span>' : "") +
-            '<p class="val">' + linkify(r.value) + "</p>" +
-          "</div>" +
-          '<button class="copy">Копировать</button>';
+            '<p class="val">' + linkify(r.value) + '</p>' +
+          '</div><button class="copy">Копировать</button>';
         row.querySelector(".copy").onclick = e => copy(r.value, e.currentTarget);
         box.appendChild(row);
       });
 
       slip.querySelector("[data-all]").onclick = e => copy(n.text, e.currentTarget);
-      slip.querySelector("[data-del]").onclick = () =>
-        mutate(list => list.filter(x => x.id !== n.id));
+      const del = slip.querySelector("[data-del]");
+      if(del) del.onclick = () => mutate(list => list.filter(x => x.id !== n.id));
 
       feed.appendChild(slip);
     });
 
-    $("count").textContent = notes.length + " " + plural(notes.length, "запись","записи","записей");
+    $("count").textContent = notes.length + " " + plural(notes.length,"запись","записи","записей") +
+      (canWrite() ? "" : " · только чтение");
   }
 
-  function plural(n, a, b, c){
-    const m = n % 100, k = n % 10;
-    if(m > 10 && m < 20) return c;
-    if(k === 1) return a;
-    if(k >= 2 && k <= 4) return b;
+  function plural(n,a,b,c){
+    const m = n%100, k = n%10;
+    if(m>10 && m<20) return c;
+    if(k===1) return a;
+    if(k>=2 && k<=4) return b;
     return c;
   }
 
-  function fail(title, body){
-    feed.innerHTML = '<div class="note err"><b>' + esc(title) + "</b>" + esc(body) + "</div>";
-  }
+  function fail(t,b){ feed.innerHTML = '<div class="note err"><b>' + esc(t) + '</b>' + esc(b) + '</div>'; }
 
   /* ---------- копирование ---------- */
 
   async function copy(text, btn){
     let ok = false;
-    try{
-      await navigator.clipboard.writeText(text);
-      ok = true;
-    }catch{
+    try{ await navigator.clipboard.writeText(text); ok = true; }
+    catch{
       const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.setAttribute("readonly","");
+      ta.value = text; ta.setAttribute("readonly","");
       ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
       document.body.appendChild(ta);
       ta.select(); ta.setSelectionRange(0, text.length);
@@ -502,49 +428,73 @@ textarea.field{resize:vertical;min-height:44px;line-height:1.5}
     setTimeout(() => { btn.textContent = label; btn.classList.remove("ok"); }, 1100);
   }
 
-  /* ---------- отправка с телефона ---------- */
+  /* ---------- настройки ---------- */
+
+  function showSetup(){
+    $("setup").classList.remove("hidden");
+    $("setupHint").textContent = cfg.auto
+      ? "Репозиторий определён автоматически по адресу сайта — менять обычно не нужно. Токен нужен только там, откуда хочешь удалять записи или писать в ленту."
+      : "Токен нужен только там, откуда хочешь удалять записи или писать в ленту.";
+    $("inRepo").value   = cfg.repo;
+    $("inBranch").value = cfg.branch;
+    $("inToken").value  = cfg.token;
+  }
+
+  $("openCfg").onclick  = showSetup;
+  $("closeCfg").onclick = () => $("setup").classList.add("hidden");
+
+  $("saveCfg").onclick = () => {
+    const repo = $("inRepo").value.trim()
+      .replace(/^https?:\/\/github\.com\//,"").replace(/\.git$/,"").replace(/\/+$/,"");
+    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){ wire("err","укажи owner/repo"); return; }
+    cfg.repo   = repo;
+    cfg.auto   = repo === detect();
+    cfg.branch = $("inBranch").value.trim() || "main";
+    cfg.token  = $("inToken").value.trim();
+    persist();
+    $("setup").classList.add("hidden");
+    last = null; seen = new Set(); first = true;
+    start();
+  };
+
+  /* ---------- запись с сайта ---------- */
 
   const ta = $("compose");
   ta.addEventListener("input", () => {
     ta.style.height = "auto";
     ta.style.height = Math.min(ta.scrollHeight, 180) + "px";
   });
-
   $("send").onclick = async () => {
     const text = ta.value.trim();
     if(!text) return;
     ta.value = ""; ta.style.height = "auto";
-    const note = { id: "w" + Date.now().toString(36), ts: Math.floor(Date.now()/1000), text, from: "web" };
-    await mutate(list => [note, ...list].slice(0, 300));
+    await mutate(list => [{
+      id: "w" + Date.now().toString(36),
+      ts: Math.floor(Date.now()/1000),
+      text: text, from: "web"
+    }, ...list].slice(0,300));
   };
-
   $("clearAll").onclick = () => {
-    if(!notes.length) return;
-    if(!confirm("Удалить всю ленту?")) return;
-    mutate(() => []);
+    if(notes.length && confirm("Удалить всю ленту?")) mutate(() => []);
   };
 
-  /* ---------- статус и цикл ---------- */
+  /* ---------- цикл ---------- */
 
-  function wire(state, text){
-    $("wire").dataset.s = state;
-    $("wireText").textContent = text;
-  }
-  function stop(){ clearInterval(timer); timer = null; }
+  function wire(s,t){ $("wire").dataset.s = s; $("wireText").textContent = t; }
   function start(){
-    stop();
+    clearInterval(timer);
     pull();
     timer = setInterval(() => { if(!document.hidden) pull(); }, POLL);
   }
-  function boot(){ wire("off","подключаюсь"); start(); }
-
   document.addEventListener("visibilitychange", () => { if(!document.hidden) pull(); });
 
   cfg = loadCfg();
-  if(cfg && cfg.repo && cfg.token){ boot(); }
+  if(cfg.repo){ start(); }
   else {
-    showSetup(false);
-    fail("Не подключено", "Заполни поля выше — репозиторий с notes.json и токен с правом записи.");
+    wire("err","не настроен");
+    fail("Не понял, какой репозиторий читать",
+         "Сайт открыт не с GitHub Pages, поэтому определить репозиторий автоматически не вышло. Нажми «Настройки» и впиши его вручную.");
+    showSetup();
   }
 })();
 </script>
